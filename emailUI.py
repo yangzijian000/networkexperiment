@@ -72,19 +72,19 @@ class email_senderui(QtWidgets.QWidget,Email.Ui_Form):
         super(email_senderui,self).__init__()
         self.sender = sender
         self.passwd = passwd
-        self.recv = ''
+        self.rcpt = ''
         self.setupUi(self)
         self.initui()
     def initui(self):
         self.pushButton.clicked.connect(self.pushButton_clicked)
         self.pushButton_2.clicked.connect(self.pushButton_2_clicked)
     def pushButton_clicked(self):
-        self.recv = str(self.lineEdit.text())
+        self.rcpt = str(self.lineEdit.text())
         self.subject = str(self.lineEdit_2.text())
         self.msg = str(self.textEdit.toPlainText())
         self.senderEmail()
     def pushButton_clicked_2(self):
-        self.recv = str(self.lineEdit.text())
+        self.rcpt = str(self.lineEdit.text())
         self.subject = str(self.lineEdit_2.text())
         self.msg = str(self.textEdit.toPlainText())
         self.sendermail_Enclosure()
@@ -103,13 +103,13 @@ class email_senderui(QtWidgets.QWidget,Email.Ui_Form):
             print (match)
             msg=MIMEText(text,'plain','utf-8')#plain是指显示纯文本
             msg['From']=formataddr(["YANGz1J",self.sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
-            msg['To']=formataddr(["YANGz1J",self.recv])              # 括号里的对应收件人邮箱昵称、收件人邮箱账号
+            msg['To']=formataddr(["YANGz1J",self.rcpt])              # 括号里的对应收件人邮箱昵称、收件人邮箱账号
             msg['Subject']=self.subject                # 邮件的主题，也可以说是标题
             emailserver = 'smtp.%s.com'%(match)
             server=smtplib.SMTP(emailserver, 25)  # 发件人邮箱中的SMTP服务器，端口是25
             server.set_debuglevel(1)
             server.login(self.sender, self.passwd)  # 括号中对应的是发件人邮箱账号、邮箱密码
-            server.sendmail(self.sender,self.recv,msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
+            server.sendmail(self.sender,self.rcpt,msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
             server.quit()  # 关闭连接
         except Exception as e:  # 如果 try 中的语句没有执行，则会执行下面的
             print(e)
@@ -119,7 +119,7 @@ class email_senderui(QtWidgets.QWidget,Email.Ui_Form):
             text = self.msg
             msg = MIMEMultipart()
             msg['From'] = formataddr(["YANGz1J", self.sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
-            msg['To'] = formataddr(["YANGz1J", self.recv])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
+            msg['To'] = formataddr(["YANGz1J", self.rcpt])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
             msg['Subject'] = self.subject  # 邮件的主题，也可以说是标题
 
             # 邮件正文内容
@@ -127,11 +127,11 @@ class email_senderui(QtWidgets.QWidget,Email.Ui_Form):
 
 
             context_type = {'.tif':'image/tiff', '.avi':'video/avi', '.htm':'text/html','.txt':'text/plain',
-                            '.jpg':'image/jpeg','.mp3':'audio/mp3','.PDF':'application/pdf'}
+                            '.jpg':'image/jpeg','.mp3':'audio/mp3','.PDF':'application/pdf','.pdf':'application/pdf'}
             # 构造附件
             for fname in self.fnames[0]:
                 att = MIMEText(open(fname, 'rb').read(),'base64','utf-8')# base64表示MIME的加密方式，是一种8bite编码方式
-                fname = fname
+
                 print (fname)
                 pattern = re.compile(r'/([^/]+(\.[\w]+))')
                 match =pattern.search(fname)
@@ -140,6 +140,7 @@ class email_senderui(QtWidgets.QWidget,Email.Ui_Form):
                 print(filename.encode('gbk').decode('gbk'))
                 att["Content-Type"] = context_type[filetype]
                 content_disposition = 'attachment; filename=%s'%(filename)# 这里的filename可以任意写，写什么名字，邮件中显示什么名字
+                #attachment --- 作为附件下载
                 print(content_disposition)
                 att["Content-Disposition"] = content_disposition
                 msg.attach(att)
@@ -151,7 +152,7 @@ class email_senderui(QtWidgets.QWidget,Email.Ui_Form):
             server = smtplib.SMTP(emailserver, 25)  # 发件人邮箱中的SMTP服务器，端口是25
             server.set_debuglevel(1)
             server.login(self.sender, self.passwd)  # 括号中对应的是发件人邮箱账号、邮箱密码
-            server.sendmail(self.sender, self.recv, msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
+            server.sendmail(self.sender, self.rcpt, msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
             server.quit()  # 关闭连接
         except Exception as e:  # 如果 try 中的语句没有执行，则会执行下面的语句
             print (e)
