@@ -88,6 +88,8 @@ class email_senderui(QtWidgets.QWidget,Email.Ui_Form):
         self.subject = str(self.lineEdit_2.text())
         self.msg = str(self.textEdit.toPlainText())
         self.sendermail_Enclosure()
+        self.pushButton.clicked.disconnect(self.pushButton_clicked_2)
+        self.pushButton.clicked.connect(self.pushButton_clicked)
     def pushButton_2_clicked(self):
         self.fnames = QtWidgets.QFileDialog.getOpenFileNames(self,'请选择附件','/.')
         self.pushButton.clicked.disconnect(self.pushButton_clicked)
@@ -123,26 +125,24 @@ class email_senderui(QtWidgets.QWidget,Email.Ui_Form):
             # 邮件正文内容
             msg.attach(MIMEText(text, 'plain', 'utf-8'))
 
-            # 构造附件1，传送当前目录下的 TaylorSwift.jpg 文件
+
             context_type = {'.tif':'image/tiff', '.avi':'video/avi', '.htm':'text/html','.txt':'text/plain',
-                            '.jpg':'image/jpeg','.mp3':'audio/mp3','.pdf':'application/pdf'}
+                            '.jpg':'image/jpeg','.mp3':'audio/mp3','.PDF':'application/pdf'}
+            # 构造附件
             for fname in self.fnames[0]:
-                att = MIMEText(open(fname, 'rb').read(),'base64','utf-8')
-                fname = fname.encode('gbk')
+                att = MIMEText(open(fname, 'rb').read(),'base64','utf-8')# base64表示MIME的加密方式，是一种8bite编码方式
+                fname = fname
                 print (fname)
                 pattern = re.compile(r'/([^/]+(\.[\w]+))')
                 match =pattern.search(fname)
                 filename = match.group(1)
                 filetype = match.group(2)
-
+                print(filename.encode('gbk').decode('gbk'))
                 att["Content-Type"] = context_type[filetype]
-                att["Content-Disposition"] = 'attachment; filename=%s'%(filename)
+                content_disposition = 'attachment; filename=%s'%(filename)# 这里的filename可以任意写，写什么名字，邮件中显示什么名字
+                print(content_disposition)
+                att["Content-Disposition"] = content_disposition
                 msg.attach(att)
-            # att1 = MIMEText(open('TaylorSwift.jpg', 'rb').read(), 'base64', 'utf-8')  # base64表示MIME的编码方式，是一种8bite编码方式
-            # att1["Content-Type"] = 'application/octet-stream'
-            # # 这里的filename可以任意写，写什么名字，邮件中显示什么名字
-            # att1["Content-Disposition"] = 'attachment; filename="TaylorSwift.jpg"'
-            # msg.attach(att1)
             pattern = re.compile(r'@([\S]+)\.com')
             print (type(self.sender))
             match = pattern.search(str(self.sender)).group(1)
@@ -153,7 +153,7 @@ class email_senderui(QtWidgets.QWidget,Email.Ui_Form):
             server.login(self.sender, self.passwd)  # 括号中对应的是发件人邮箱账号、邮箱密码
             server.sendmail(self.sender, self.recv, msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
             server.quit()  # 关闭连接
-        except Exception as e:  # 如果 try 中的语句没有执行，则会执行下面的 ret=False
+        except Exception as e:  # 如果 try 中的语句没有执行，则会执行下面的语句
             print (e)
 
 class Team(QtWidgets.QWidget,team.Ui_Form):
