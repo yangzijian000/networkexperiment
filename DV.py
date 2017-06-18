@@ -48,6 +48,9 @@ class Ui_MainWindow(object):
         self.startButton = QtWidgets.QPushButton(self.centralwidget)
         self.startButton.setGeometry(QtCore.QRect(140, 340, 99, 27))
         self.startButton.setObjectName("startButton")
+        self.updateButton = QtWidgets.QPushButton(self.centralwidget)
+        self.updateButton.setGeometry(QtCore.QRect(140,245,99,27))
+        self.updateButton.setObjectName("updateButton")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -66,7 +69,7 @@ class Ui_MainWindow(object):
         self.label_5.setText(_translate("MainWindow", "程序仿真日志:"))
         self.addrouterButton.setText(_translate("MainWindow", "添加"))
         self.startButton.setText(_translate("MainWindow", "仿真开始"))
-
+        self.updateButton.setText(_translate("MainWindow", "更新"))
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

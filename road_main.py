@@ -25,6 +25,7 @@ class DV_main_window(QtWidgets.QMainWindow,DV.Ui_MainWindow):
     def setui(self):
         self.addrouterButton.clicked.connect(self.addrouter)
         self.startButton.clicked.connect(self.InitDxy)
+        self.updateButton.clicked.connect(self.updaterouter)
     def addrouter(self):
         try:
             routername = self.routername.text()
@@ -78,8 +79,18 @@ class DV_main_window(QtWidgets.QMainWindow,DV.Ui_MainWindow):
         except Exception as e:
             print(e)
 
-
-
+    def updaterouter(self):
+        try:
+            routername = self.routername.text()
+            text = self.nbnoodinf.text()
+            pattern = re.compile(r'(\w:\d)')
+            matchs = pattern.findall(text)
+            neighbors = {}
+            for match in matchs:
+                neighbors[match[0]] = match[2]
+            noodlist[routername].update(neighbors)
+        except Exception as e:
+            print(e)
 class Nood(object):
     def __init__(self, routername, neighbors):
         self.name = routername
@@ -125,6 +136,9 @@ class Nood(object):
             for neighbor in self.neighbors.keys():
                 noodlist[neighbor].Bellman_Ford()
 
+    def update(self,neighbors):
+        self.neighbors = neighbors
+        self.Bellman_Ford()
 if __name__ == '__main__':
     # text = '1:2,2:3,3:5,6:9'
     # pattern = re.compile(r'(\w:\d)')
